@@ -4,7 +4,7 @@ import {computed, Injectable, signal} from '@angular/core';
   providedIn: 'root'
 })
 export class SpinnerService {
-  private isVisible = signal<boolean>(true);
+  private isVisible = signal<boolean>(false);
 
   readonly isVisible$ = computed(() => this.isVisible());
 
