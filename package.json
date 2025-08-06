@@ -29,6 +29,7 @@
     "@angular/material": "^20.1.4",
     "@angular/platform-browser": "^20.1.0",
     "@angular/router": "^20.1.0",
+    "@angular/service-worker": "^20.1.0",
     "@tailwindcss/postcss": "^4.1.11",
     "ngx-toastr": "^19.0.0",
     "postcss": "^8.5.6",
