@@ -1,1 +1,15 @@
 /* You can add global styles to this file, and also import other style files */
+@import "tailwindcss";
+
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+
+@layer components {
+  .btn-tiny--blue {
+    @apply py-1.5 px-3.5 text-xs max-h-max bg-indigo-500 text-white rounded cursor-pointer font-medium leading-5 text-center shadow-xs transition-all duration-500 hover:bg-indigo-700;
+    &:disabled {
+      @apply opacity-50 cursor-not-allowed bg-indigo-400 hover:bg-indigo-400;
+    }
+  }
+}
