@@ -16,6 +16,7 @@ import {MatPaginator} from '@angular/material/paginator';
 import mockData from './mock-data';
 import {MatProgressSpinner} from '@angular/material/progress-spinner';
 import {SpinnerService} from './services/spinner.service';
+import {ToastrService} from 'ngx-toastr';
 
 @Component({
   selector: 'app-root',
@@ -25,6 +26,7 @@ import {SpinnerService} from './services/spinner.service';
 })
 export class App implements OnInit, AfterViewInit {
   spinnerService = inject(SpinnerService);
+  toastrService = inject(ToastrService);
   displayedColumns: string[] = ['id', 'name', 'uniqueNumber', 'canAssignQuantity', 'quantity', 'actions'];
   dataSource = new MatTableDataSource<TrainComponent>([]);
 
@@ -35,6 +37,16 @@ export class App implements OnInit, AfterViewInit {
   ngOnInit(): void {
     localStorage.setItem('train_components', JSON.stringify(mockData));
     this.load();
+
+
+    window.addEventListener('online', () => {
+      this.toastrService.info('The Internet is restored!', 'Network');
+      this.service.syncPendingOperations();
+    });
+    window.addEventListener('offline', () => this.toastrService.warning('Internet is disconnected. We work offline.', 'Network'));
+    if (!navigator.onLine) {
+      this.toastrService.warning('Internet is disconnected. We work offline.', 'Network');
+    }
   }
 
   ngAfterViewInit() {

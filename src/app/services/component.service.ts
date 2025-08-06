@@ -5,6 +5,7 @@ import {SpinnerService} from './spinner.service';
 import {ToastrService} from 'ngx-toastr';
 
 const STORAGE_KEY = 'train_components';
+const PENDING_OPERATIONS_KEY = 'pending-operations';
 
 @Injectable({
   providedIn: 'root'
@@ -49,6 +50,10 @@ export class ComponentService {
       try {
         //throw new Error('имитирова ошибку'); // имитирова ошибку
 
+        if (!navigator.onLine) {
+          this.saveToPendingOperations('update', component);
+        }
+
         const components = this.components.map(c => (c.id === component.id ? component : c));
         this.components = components;
         observer.next(component);
@@ -70,6 +75,10 @@ export class ComponentService {
       try {
         // throw new Error('имитирова ошибку'); // имитирова ошибку
 
+        if (!navigator.onLine) {
+          this.saveToPendingOperations('add', component);
+        }
+
         const components = [...this.components, component];
         this.components = components;
         observer.next(component);
@@ -84,6 +93,27 @@ export class ComponentService {
         return throwError(() => new Error('Error saving component'));
       })
     );
+  }
+
+  saveToPendingOperations(action: 'update' | 'add', component: TrainComponent) {
+    // Save the operation for future synchronization
+    const pending = JSON.parse(localStorage.getItem(PENDING_OPERATIONS_KEY) || '[]');
+    pending.push({ action: action, component });
+    localStorage.setItem(PENDING_OPERATIONS_KEY, JSON.stringify(pending));
+  }
+
+  syncPendingOperations() {
+    if (navigator.onLine) {
+      const pending = JSON.parse(localStorage.getItem(PENDING_OPERATIONS_KEY) || '[]');
+      // Logic for sending pending to server via API
+      // After successful synchronization, clear the queue
+      localStorage.setItem(PENDING_OPERATIONS_KEY, '[]');
+
+      setTimeout(() => {
+        this.toastrService.success('successfully synchronized!', 'Server');
+      }, 500)
+
+    }
   }
 
 }
