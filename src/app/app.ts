@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, OnInit, ViewChild} from '@angular/core';
+import {AfterViewInit, Component, inject, OnInit, ViewChild} from '@angular/core';
 import {TrainComponent} from './models/component.model';
 import {ComponentService} from './services/component.service';
 import {MatDialog} from '@angular/material/dialog';
@@ -13,14 +13,18 @@ import {
 } from '@angular/material/table';
 import {ComponentModal} from './modals/component-modal/component-modal';
 import {MatPaginator} from '@angular/material/paginator';
+import mockData from './mock-data';
+import {MatProgressSpinner} from '@angular/material/progress-spinner';
+import {SpinnerService} from './services/spinner.service';
 
 @Component({
   selector: 'app-root',
-  imports: [MatTable, MatHeaderCell, MatCell, MatColumnDef, MatCellDef, MatHeaderRow, MatRow, MatHeaderRowDef, MatRowDef, MatHeaderCellDef, MatPaginator],
+  imports: [MatTable, MatHeaderCell, MatCell, MatColumnDef, MatCellDef, MatHeaderRow, MatRow, MatHeaderRowDef, MatRowDef, MatHeaderCellDef, MatPaginator, MatProgressSpinner],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
 export class App implements OnInit, AfterViewInit {
+  spinnerService = inject(SpinnerService);
   displayedColumns: string[] = ['id', 'name', 'uniqueNumber', 'canAssignQuantity', 'quantity', 'actions'];
   dataSource = new MatTableDataSource<TrainComponent>([]);
 
@@ -29,13 +33,7 @@ export class App implements OnInit, AfterViewInit {
   constructor(private service: ComponentService, private dialog: MatDialog) {}
 
   ngOnInit(): void {
-    localStorage.setItem('train_components', JSON.stringify([
-      { id: 1, name: 'Engine', uniqueNumber: 'ENG123', canAssignQuantity: false },
-      { id: 2, name: 'Passenger Car', uniqueNumber: 'PAS456', canAssignQuantity: true, quantity: 10 },
-      { id: 3, name: 'Dining Car', uniqueNumber: 'DIN789', canAssignQuantity: true, quantity: 2 },
-      { id: 4, name: 'Wheel', uniqueNumber: 'WHL001', canAssignQuantity: true, quantity: 100 },
-    ]));
-
+    localStorage.setItem('train_components', JSON.stringify(mockData));
     this.load();
   }
 
@@ -44,12 +42,21 @@ export class App implements OnInit, AfterViewInit {
   }
 
   load() {
-    this.dataSource.data = this.service.getAll();
+
+    this.spinnerService.show();
+
+    this.service.getAll().subscribe({
+      next: components => {
+        this.dataSource.data = components;
+        this.spinnerService.hide();
+      },
+      error: err => {}
+    });
   }
 
   addNew() {
     const component: TrainComponent = {
-      id: this.service.getAll().length + 1,
+      id: this.dataSource.data.length + 1,
       name: '',
       uniqueNumber: '',
       canAssignQuantity: false
@@ -68,7 +75,11 @@ export class App implements OnInit, AfterViewInit {
       data: { component, mode },
     });
 
-    dialogRef.afterClosed().subscribe(() => this.load());
+    dialogRef.afterClosed().subscribe((data) => {
+      if (data?.saved) {
+        this.load()
+      }
+    });
   }
 
 }

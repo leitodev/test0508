@@ -73,12 +73,16 @@ export class ComponentModal implements OnInit {
       result.quantity = 0;
     }
     if (this.data.mode === 'add') {
-      this.service.add(result);
+      this.service.add(result).subscribe(() => {
+        this.dialogRef.close({ saved: true });
+        return;
+      });
     } else {
-      this.service.update(result);
+      this.service.update(result).subscribe(() => {
+        this.dialogRef.close({ saved: true });
+        return;
+      });
     }
-
-    this.dialogRef.close();
   }
 
 

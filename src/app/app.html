@@ -1,9 +1,9 @@
-<div class="p-4">
+<div class="p-1">
   <h1 class="text-xl font-bold mb-4">Train Component Manager</h1>
 
   <button type="button" class="btn-tiny--blue" (click)="addNew()">add new component</button>
 
-  <table mat-table [dataSource]="dataSource" class="mat-elevation-z8 w-full">
+  <table mat-table [dataSource]="dataSource" class="mat-elevation-z8">
     <ng-container matColumnDef="id">
       <th mat-header-cell *matHeaderCellDef>ID</th>
       <td mat-cell *matCellDef="let element">{{ element.id }}</td>
@@ -39,11 +39,12 @@
     <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
     <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
   </table>
-
   <mat-paginator
     [pageSizeOptions]="[5, 10, 20, 50, 100]"
     showFirstLastButtons
     class="bg-gray-50 p-2 border-t"
   ></mat-paginator>
-
+</div>
+<div [hidden]="!spinnerService.isVisible$()" class="fixed top-0 right-0 flex items-center justify-center" >
+  <mat-spinner></mat-spinner>
 </div>
